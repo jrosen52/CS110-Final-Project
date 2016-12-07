@@ -1,6 +1,8 @@
 import math
 import pygame
 import random
+import pickle
+import os.path
 
 #block dimensions
 block_width = 23
@@ -246,8 +248,8 @@ class Game:
         top1 = 80
         top2 = 80
 
-        # Number of blocks to create
-        blockcount = 15
+        # Number of blocks to create(changed it from 15 to 1 to make the game finish faster)
+        blockcount = 1
 
         colors1 = [red, blue, green, yellow, magenta]
         random.shuffle(colors1)
@@ -272,6 +274,9 @@ class Game:
 
         #create clock to limit speed
         clock = pygame.time.Clock()
+
+        #create second clock to record time for highscores
+        clock2 = pygame.time.Clock()
 
         #create timer to keep track of highscores
         timer = 0
@@ -393,6 +398,39 @@ class Game:
                 textpos = text.get_rect(centerx=background.get_width()/2)
                 textpos.top = 300
                 screen.blit(text, textpos)
+
+                # Records and adds time to high score list when finished
+                if(os.path.isfile("BlockGame_Highscores.txt") == False):
+                    high_scores = [800,700,600,500,400]
+                    for x in range(1):
+                        end_time = int(round(pygame.time.get_ticks()/1000))
+                    high_scores.append(end_time)
+                    high_scores.sort()
+
+                    while(len(high_scores) > 5):
+                        del high_scores[-1]
+
+                    pickle.dump(high_scores, open("BlockGame_Highscores.txt", "wb"))
+
+                else:
+                    with open('BlockGame_Highscores.txt', 'rb') as f:
+                        high_scores = pickle.load(f)
+                    for x in range(1):
+                        end_time = int(round(pygame.time.get_ticks()/1000))
+                    high_scores.append(end_time)
+                    high_scores.sort()
+
+                    while(len(high_scores) > 5):
+                        del high_scores[-1]
+
+                    with open('BlockGame_Highscores.txt', 'wb') as f:
+                        pickle.dump(high_scores, f)
+
+                #This is test code to show that it is printing several times
+                for x in range(1):
+                    end_score = int(round(pygame.time.get_ticks()/1000))
+                    print(end_score)
+
 
             if (pygame.sprite.spritecollide(ball1, players, 0)):
 
